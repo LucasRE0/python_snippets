@@ -13,8 +13,8 @@ def get_file_pathes_w_exts(input_dir, exts, recursive=False):
         elif isinstance(exts, (list, tuple)):
             ret_list = []
             for ext in exts:
-                ret_list += sorted(glob(os.path.join(input_dir, "**", "*"+ext), recursive=True))
-            return ret_list
+                ret_list += glob(os.path.join(input_dir, "**", "*"+ext), recursive=True)
+            return sorted(ret_list)
     else:
         return sorted([os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith(exts)])
 
