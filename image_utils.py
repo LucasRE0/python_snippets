@@ -51,5 +51,14 @@ def make_grid(arr_list):
     ret_arr = np.vstack(ret_arr)
     return ret_arr
 
-
-
+### torchvision ver, save image
+import torch
+import torchvision
+def save_gridimage(images_arr, save_path, nrow=2, padding=0):
+    images_arr = (images_arr / 255.0).astype(np.float32)
+    images_arr = np.transpose(images_arr, [0,3,1,2])
+    images_tensor = torch.as_tensor(images_arr)
+    torchvision.utils.save_image(
+        images_tensor, 
+        save_path,
+        nrow=nrow, padding=padding)
