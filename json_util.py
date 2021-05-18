@@ -9,7 +9,7 @@ class ExtendJSONEncoder(json.JSONEncoder):
             ### numpy array -> list
             return value.tolist()
         else:
-            return super(ExtendJSPNEncoder, self).default(value)
+            return super(ExtendJSONEncoder, self).default(value)
  
 
 def load_json_file(load_path):
