@@ -1,6 +1,7 @@
 import json
 
 import numpy as np
+import torch
 
 
 class ExtendJSONEncoder(json.JSONEncoder):
@@ -8,6 +9,12 @@ class ExtendJSONEncoder(json.JSONEncoder):
         if isinstance(value, np.ndarray):
             ### numpy array -> list
             return value.tolist()
+        elif isinstance(value, torch.Tensor):
+            ### torch tensor -> list
+            return value.tolist()
+        if isinstance(value, object) and hasattr(value, '__dict__'):
+            ### original class -> dict
+            return value.__dict__
         else:
             return super(ExtendJSONEncoder, self).default(value)
  
@@ -28,17 +35,27 @@ def print_json(data):
         
       
 def get_json_summary(data):
-    assert isinstance(data, dict), "get_json_summary() got unexpected type data: {}".formata(type(data))
+    if isinstance(data, object) and hasattr(data, '__dict__'):
+        ### original class -> dict
+        data = data.__dict__
+    assert isinstance(data, dict), "get_json_summary() got unexpected type data: {}".format(type(data))
     ret_data = {}
     for key, value in data.items():
         if isinstance(value, dict):
             summary_value = get_json_summary(value)
         else:
-            summary_value = str(type(value))
-            if isinstance(value, list):
-                summary_value += " : len {}".format(len(value))
-            elif isinstance(value, np.ndarray):
-                summary_value += " : shape {}".format(value.shape)
+            if value is None or isinstance(value, (bool, int)):
+                summary_value = value
+            elif isinstance(value, str):
+                summary_value = value if len(value) <= 32 else str(type(value))
+            else:
+                summary_value = str(type(value))
+                if isinstance(value, (list, tuple)):
+                    summary_value += " : len {}".format(len(value))
+                elif isinstance(value, np.ndarray):
+                    summary_value += " : shape {}".format(value.shape)
+                elif isinstance(value, torch.Tensor):
+                    summary_value += " : shape {}".format(value.shape)
                 
         ret_data[key] = summary_value
     return ret_data
