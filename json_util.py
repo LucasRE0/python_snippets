@@ -51,7 +51,10 @@ def get_json_summary(data):
             else:
                 summary_value = str(type(value))
                 if isinstance(value, (list, tuple)):
-                    summary_value += " : len {}".format(len(value))
+                    if all([isinstance(i, dict) for i in value]):
+                        summary_value = [get_json_summary(i) for i in value]
+                    else:
+                        summary_value += " : len {}".format(len(value))
                 elif isinstance(value, np.ndarray):
                     summary_value += " : shape {}".format(value.shape)
                 elif isinstance(value, torch.Tensor):
