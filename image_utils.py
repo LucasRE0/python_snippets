@@ -62,3 +62,24 @@ def save_gridimage(images_arr, save_path, nrow=2, padding=0):
         images_tensor, 
         save_path,
         nrow=nrow, padding=padding)
+
+#-------------------------
+### PIL ver
+def apply_mask(img, mask):
+    masked = img * (mask > 0)
+    return masked
+
+def apply_mask_for_dir(img_dir, mask_dir):
+    ### get img names
+    img_names = sorted([f for f in os.listdir(img_dir) if f.endswith((".jpg", ".png"))])
+
+    for img_name in img_names:
+        img_path = os.path.join(img_dir, img_name)
+        mask_path = os.path.join(mask_dir, img_name)
+
+        img = np.array(Image.open(img_path))
+        mask = np.array(Image.open(mask_path))
+        masked = apply_mask(img, mask)
+
+        save_path = os.path.join(mask_dir, img_name[:-4] + "_masked.png")
+        Image.fromarray(masked).save(save_path)
